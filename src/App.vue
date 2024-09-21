@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gray-100">
-    <header class="bg-white shadow">
-      <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
+  <div class="min-h-screen">
+    <header class="bg-white">
+      <nav class="w-full px-4 py-4 flex justify-between items-center shadow">
         <h1 class="text-2xl font-bold text-gray-800">AgentNet</h1>
         <div>
           <router-link to="/login" class="text-blue-600 hover:text-blue-800">Login</router-link>
