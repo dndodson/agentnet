@@ -37,5 +37,5 @@ Authentication is handled by Supabase. Users can be created using the Supabase c
 
 ## Hosting and Deployment
 
-This application is hosted on Netlify. 
+This application is hosted on Netlify. Netlify is integrated with Github, and automatically builds and deploys the project upon certain events in the Github repository. Its Netlify URL is https://agentthis.netlify.app/. Netlify is configured to generate a "deploy preview" URL for each pull request, which can be accessed by following the Netlify link on the pull request page. After the pull request is merged, the changes will be deployed to the production Netlify site.
 
