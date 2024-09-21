@@ -29,12 +29,12 @@
     methods: {
       async handleLogin() {
         try {
-          const { user, error } = await supabase.auth.signIn({
+          const { data, error } = await supabase.auth.signInWithPassword({
             email: this.email,
             password: this.password,
           })
           if (error) throw error
-          console.log('User logged in:', user)
+          console.log('User logged in:', data.user)
           // TODO: Redirect to dashboard or home page
         } catch (error) {
           console.error('Error logging in:', error.message)
