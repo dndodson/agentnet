@@ -20,7 +20,6 @@
   <script>
   export default {
     name: 'ControlPanel',
-    // Add any necessary component logic here
   }
   </script>
   
