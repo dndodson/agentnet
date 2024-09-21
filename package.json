@@ -1,7 +1,7 @@
 {
-  "name": "agentnet",
+  "name": "aigentnet",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -17,15 +17,15 @@
     "vue-router": "^4.4.5"
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.21.3",
     "@vitejs/plugin-vue": "^5.1.2",
     "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.47",
-    "tailwindcss": "^3.4.12",
-    "vite": "^5.4.1",
     "eslint": "^8.38.0",
     "eslint-plugin-vue": "^9.11.0",
-    "stylelint": "^15.6.0",
-    "stylelint-config-standard": "^33.0.0",
-    "@babel/eslint-parser": "^7.21.3"
+    "postcss": "^8.4.47",
+    "stylelint-config-standard": "^36.0.1",
+    "stylelint-config-tailwindcss": "^0.0.7",
+    "tailwindcss": "^3.4.12",
+    "vite": "^5.4.1"
   }
 }
