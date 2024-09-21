@@ -16,7 +16,7 @@
   </template>
   
   <script>
-  import { supabase } from '../supabase'
+  import { supabase } from '../lib/supabase'
 
   export default {
     name: 'Login',
@@ -35,7 +35,7 @@
           })
           if (error) throw error
           console.log('User logged in:', data.user)
-          // TODO: Redirect to dashboard or home page
+          this.$router.push('/control-panel')
         } catch (error) {
           console.error('Error logging in:', error.message)
           // TODO: Show error message to user
