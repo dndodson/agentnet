@@ -14,13 +14,10 @@ jobs:
     - name: Use Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '18'
+        node-version: '20'
 
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Install ESLint and Stylelint
-      run: npm install eslint stylelint stylelint-config-standard
+    - name: Install devDependencies
+      run: npm ci --only=dev
 
     - name: Run ESLint
       run: npx eslint . --ext .js,.vue
