@@ -1,0 +1,30 @@
+name: Lint
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+
+    - name: Install devDependencies
+      run: npm ci --only=dev
+
+    - name: Run ESLint
+      run: npx eslint . --ext .js,.vue
+
+    - name: Run Stylelint
+      run: npx stylelint "**/*.css"
+
+    - name: Check for uncommitted changes
+      run: |
+        git diff --exit-code || (echo "Error: There are uncommitted changes. Please commit all changes before merging." && exit 1)

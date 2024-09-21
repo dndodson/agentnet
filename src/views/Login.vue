@@ -19,7 +19,7 @@
   import { supabase } from '../lib/supabase'
 
   export default {
-    name: 'Login',
+    name: 'LoginView',
     data() {
       return {
         email: '',
