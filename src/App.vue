@@ -1,30 +1,50 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+  <div class="min-h-screen">
+    <header class="bg-white">
+      <nav class="w-full px-4 py-4 flex justify-between items-center shadow">
+        <h1 class="text-2xl font-bold text-gray-800">AgentThis</h1>
+        <div>
+          <button v-if="!session" @click="$router.push('/login')" class="text-blue-600 hover:text-blue-800">Login</button>
+          <button v-else @click="handleLogout" class="text-blue-600 hover:text-blue-800">Log out</button>
+        </div>
+      </nav>
+    </header>
+    <main class="container px-4 py-8">
+      <router-view></router-view>
+    </main>
   </div>
-  <HelloWorld msg="Vite + Vue" />
 </template>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+<script>
+import { ref, onMounted } from 'vue'
+import { supabase } from './lib/supabase'
+import { useRouter } from 'vue-router'
+
+export default {
+  name: 'App',
+  setup() {
+    const session = ref(null)
+    const router = useRouter()
+
+    onMounted(() => {
+      supabase.auth.getSession().then(({ data }) => {
+        session.value = data.session
+      })
+
+      supabase.auth.onAuthStateChange((_, _session) => {
+        session.value = _session
+      })
+    })
+
+    const handleLogout = async () => {
+      await supabase.auth.signOut()
+      router.push('/')
+    }
+
+    return {
+      session,
+      handleLogout
+    }
+  }
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
-</style>
+</script>
