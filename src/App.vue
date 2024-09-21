@@ -2,7 +2,7 @@
   <div class="min-h-screen">
     <header class="bg-white">
       <nav class="w-full px-4 py-4 flex justify-between items-center shadow">
-        <h1 class="text-2xl font-bold text-gray-800">AgentNet</h1>
+        <h1 class="text-2xl font-bold text-gray-800">AgentThis</h1>
         <div>
           <button v-if="!session" @click="$router.push('/login')" class="text-blue-600 hover:text-blue-800">Login</button>
           <button v-else @click="handleLogout" class="text-blue-600 hover:text-blue-800">Log out</button>
