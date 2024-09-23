@@ -1,9 +1,9 @@
 <template>
   <div class="max-w-md mx-auto">
-    <h2 class="text-2xl font-bold mb-4 text-gray-800">Create Chatbot</h2>
+    <h2 class="text-2xl font-bold mb-4 text-gray-800">Create Agent</h2>
     <form @submit.prevent="createChatbot" class="space-y-4">
       <div>
-        <label for="chatbotName" class="block mb-1 text-gray-700">Chatbot Name</label>
+        <label for="chatbotName" class="block mb-1 text-gray-700">Agent Name</label>
         <input
           type="text"
           id="chatbotName"
@@ -25,7 +25,7 @@
         type="submit"
         class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
       >
-        Create Chatbot
+        Create Agent
       </button>
     </form>
     <div v-if="chatbotUrl" class="mt-4">
