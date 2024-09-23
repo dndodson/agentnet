@@ -2,7 +2,7 @@
     <div class="control-panel">
       <div class="sidebar">
         <div class="top-tabs">
-          <button class="tab active">Dashboard</button>
+          <button class="tab active">My Agents</button>
         </div>
         <div class="content">
           <!-- Content area -->
