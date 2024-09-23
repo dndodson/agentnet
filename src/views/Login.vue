@@ -34,8 +34,8 @@
             password: this.password,
           })
           if (error) throw error
-          console.log('User logged in:', data.user)
-          this.$router.push('/control-panel')
+          console.debug('User logged in:', data.user)
+          this.$router.push('/app')
         } catch (error) {
           console.error('Error logging in:', error.message)
           // TODO: Show error message to user
