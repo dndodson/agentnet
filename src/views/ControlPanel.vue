@@ -1,65 +1,54 @@
 <template>
-    <div class="control-panel">
-      <div class="sidebar">
-        <div class="top-tabs">
-          <button class="tab active">My Agents</button>
-        </div>
-        <div class="content">
-          <!-- Content area -->
-        </div>
-        <div class="bottom-tabs">
-          <button class="tab">Settings</button>
-        </div>
+  <div class="control-panel flex h-[calc(100vh-var(--navbar-height))]">
+    <div class="sidebar w-64 flex flex-col border-r border-gray-200">
+      <div class="top-tabs p-4">
+        <button class="tab w-full py-2 px-4 text-left bg-gray-100 rounded">My Agents</button>
       </div>
-      <div class="main-content">
-        <!-- Main content area -->
+      <div class="bottom-tabs p-4">
+        <button class="tab w-full py-2 px-4 text-left hover:bg-gray-100 rounded">Settings</button>
       </div>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    name: 'ControlPanel',
+    <div class="main-content flex-grow p-6">
+      <div v-if="!showCreateForm">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-2xl font-semibold">My Agents</h2>
+          <button @click="showCreateForm = true" class="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+          </button>
+        </div>
+        <ul class="space-y-2">
+          <!-- Agent list items will go here -->
+        </ul>
+      </div>
+      <div v-else>
+        <div class="flex items-center mb-4">
+          <button @click="showCreateForm = false" class="mr-4 text-gray-600 hover:text-gray-800">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+          </button>
+          <h2 class="text-2xl font-semibold">Create New Agent</h2>
+        </div>
+        <CreateChatbot @close="showCreateForm = false" />
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import CreateChatbot from '../components/CreateChatbot.vue'
+
+export default {
+  name: 'ControlPanel',
+  components: {
+    CreateChatbot
+  },
+  data() {
+    return {
+      showCreateForm: false
+    }
   }
-  </script>
-  
-  <style scoped>
-  .control-panel {
-    display: flex;
-    height: calc(100vh - var(--navbar-height));
-  }
-  
-  .sidebar {
-    width: 200px;
-    display: flex;
-    flex-direction: column;
-    border-right: 1px solid #ccc;
-  }
-  
-  .top-tabs, .bottom-tabs {
-    padding: 10px;
-  }
-  
-  .content {
-    overflow-y: auto; /* Add scrollbar to content if needed */
-  }
-  
-  .tab {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    text-align: left;
-    background: none;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .tab.active {
-    background-color: #e0e0e0;
-  }
-  
-  .main-content {
-    flex-grow: 1;
-    padding: 20px;
-  }
-  </style>
+}
+</script>
