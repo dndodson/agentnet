@@ -28,12 +28,6 @@
         Create Agent
       </button>
     </form>
-    <div v-if="chatbotUrl" class="mt-4">
-      <p>
-        Your chatbot has been created:
-        <a :href="chatbotUrl" target="_blank">{{ chatbotUrl }}</a>
-      </p>
-    </div>
   </div>
 </template>
 
@@ -42,11 +36,11 @@ import { supabase } from '../lib/supabase'
 
 export default {
   name: 'CreateChatbot',
+  emits: ['success', 'error'],
   data() {
     return {
       chatbotName: '',
       sourceText: '',
-      chatbotUrl: '',
     }
   },
   methods: {
@@ -60,10 +54,10 @@ export default {
           throw error
         }
 
-        this.chatbotUrl = data.chatbot_url
+        this.$emit('success', { name: this.chatbotName, id: data.chatbotId })
       } catch (error) {
         console.error('Error creating chatbot:', error.message)
-        alert('Failed to create chatbot. Please try again.')
+        this.$emit('error', error.message || 'Failed to create chatbot. Please try again.')
       }
     },
   },
