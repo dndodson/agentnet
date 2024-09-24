@@ -16,7 +16,7 @@ const routes = [
     component: Login
   },
   {
-    path: '/control-panel',
+    path: '/app',
     name: 'ControlPanel',
     component: ControlPanel,
     meta: { requiresAuth: true }
@@ -32,7 +32,7 @@ router.beforeEach(async (to, from, next) => {
   const { data: { session } } = await supabase.auth.getSession()
 
   if (to.path === '/' && session) {
-    next('/control-panel')
+    next('/app')
   } else if (to.matched.some(record => record.meta.requiresAuth) && !session) {
     next('/login')
   } else {
