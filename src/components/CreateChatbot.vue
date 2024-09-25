@@ -19,11 +19,11 @@
         />
       </div>
       <div>
-        <label for="urlToScrape" class="block mb-1 text-gray-700">Site URL</label>
+        <label for="urlToCrawl" class="block mb-1 text-gray-700">Site URL</label>
         <input
           type="url"
-          id="urlToScrape"
-          v-model="urlToScrape"
+          id="urlToCrawl"
+          v-model="urlToCrawl"
           class="w-full px-3 py-2 border rounded text-gray-800"
         />
       </div>
@@ -54,14 +54,14 @@ export default {
   data() {
     return {
       chatbotName: '',
-      urlToScrape: '',
+      urlToCrawl: '',
       sourceText: '',
       errorMessage: '',
     }
   },
   methods: {
     async createChatbot() {
-      if (!this.chatbotName || (!this.urlToScrape && !this.sourceText)) {
+      if (!this.chatbotName || (!this.urlToCrawl && !this.sourceText)) {
         this.errorMessage = 'Please provide a name and either a URL or additional source text.';
         return;
       }
@@ -70,7 +70,7 @@ export default {
         const { data, error } = await supabase.functions.invoke('createChatbot', {
           body: { 
             chatbotName: this.chatbotName, 
-            urlsToScrape: this.urlToScrape ? [this.urlToScrape] : undefined,
+            urlToScrape: this.urlToCrawl || undefined,
             sourceText: this.sourceText || undefined
           },
         })
@@ -99,7 +99,7 @@ export default {
     },
     resetForm() {
       this.chatbotName = ''
-      this.urlToScrape = ''
+      this.urlToCrawl = ''
       this.sourceText = ''
       this.errorMessage = ''
     },
