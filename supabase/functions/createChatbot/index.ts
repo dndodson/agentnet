@@ -22,10 +22,10 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { chatbotName, sourceText } = await req.json()
+    const { chatbotName, sourceText, urlsToScrape } = await req.json()
 
-    if (!chatbotName || !sourceText) {
-      return new Response(JSON.stringify({ error: 'chatbotName and sourceText are required' }), {
+    if (!(chatbotName && (sourceText || urlsToScrape))) {
+      return new Response(JSON.stringify({ error: 'chatbotName and either sourceText or urlsToScrape are required' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
@@ -39,15 +39,18 @@ Deno.serve(async (req) => {
       },
       body: JSON.stringify({
         chatbotName: chatbotName,
-        sourceText: sourceText
+        sourceText: sourceText,
+        urlsToScrape: urlsToScrape
       })
     });
-    
+
     const data = await response.json();
 
     if (!response.ok) {
-      // let text = await response.text();
-      throw new Error(`Failed to create chatbot: ${response.statusText}, ${response.status}, ${JSON.stringify(data)}`)
+      return new Response(JSON.stringify({ error: `Failed to create chatbot: ${response.statusText}`, details: data }), {
+        status: response.status,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
     }
 
     return new Response(JSON.stringify(data), {
