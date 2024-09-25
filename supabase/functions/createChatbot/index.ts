@@ -4,6 +4,7 @@
 
 // Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts"
+import { DOMParser } from "https://deno.land/x/deno_dom/deno-dom-wasm.ts"
 
 // Fetch the Chatbase API key from environment variables
 const CHATBASE_API_KEY = Deno.env.get('CHATBASE_API_KEY')
@@ -15,6 +16,46 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
+async function crawlUrl(initialUrl: string, maxDepth: number = 5): Promise<string[]> {
+  const baseUrl = new URL(initialUrl);
+  const uniqueUrls = new Set<string>();
+  const urlsToVisit: [string, number][] = [[initialUrl, 0]];
+
+  while (urlsToVisit.length > 0) {
+    const [url, depth] = urlsToVisit.pop()!;
+    if (depth > maxDepth) continue;
+
+    if (uniqueUrls.has(url)) continue;
+    uniqueUrls.add(url);
+
+    try {
+      const response = await fetch(url);
+      const html = await response.text();
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      if (!doc) continue;
+
+      const links = doc.querySelectorAll("a");
+      links.forEach((link) => {
+        const href = link.getAttribute("href");
+        if (href) {
+          try {
+            const fullUrl = new URL(href, url);
+            if (fullUrl.hostname === baseUrl.hostname && !uniqueUrls.has(fullUrl.href)) {
+              urlsToVisit.push([fullUrl.href, depth + 1]);
+            }
+          } catch (error) {
+            console.error(`Error processing URL ${href}:`, error);
+          }
+        }
+      });
+    } catch (error) {
+      console.error(`Error fetching ${url}:`, error);
+    }
+  }
+
+  return Array.from(uniqueUrls);
+}
+
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -22,13 +63,18 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { chatbotName, sourceText } = await req.json()
+    const { chatbotName, sourceText, urlToScrape } = await req.json()
 
-    if (!chatbotName || !sourceText) {
-      return new Response(JSON.stringify({ error: 'chatbotName and sourceText are required' }), {
+    if (!(chatbotName && (sourceText || urlToScrape))) {
+      return new Response(JSON.stringify({ error: 'chatbotName and either sourceText or urlToScrape are required' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
+    }
+
+    let allUrls: string[] = [];
+    if (urlToScrape) {
+      allUrls = await crawlUrl(urlToScrape);
     }
 
     const response = await fetch('https://www.chatbase.co/api/v1/create-chatbot', {
@@ -39,15 +85,18 @@ Deno.serve(async (req) => {
       },
       body: JSON.stringify({
         chatbotName: chatbotName,
-        sourceText: sourceText
+        sourceText: sourceText,
+        urlsToScrape: allUrls.length > 0 ? allUrls : undefined
       })
     });
-    
+
     const data = await response.json();
 
     if (!response.ok) {
-      // let text = await response.text();
-      throw new Error(`Failed to create chatbot: ${response.statusText}, ${response.status}, ${JSON.stringify(data)}`)
+      return new Response(JSON.stringify({ error: `Failed to create chatbot: ${response.statusText}`, details: data }), {
+        status: response.status,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
     }
 
     return new Response(JSON.stringify(data), {
