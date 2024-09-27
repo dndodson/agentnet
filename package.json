@@ -9,9 +9,13 @@
     "preview": "vite preview",
     "lint:js": "eslint . --ext .js,.vue",
     "lint:css": "stylelint \"**/*.css\"",
-    "lint": "npm run lint:js && npm run lint:css"
+    "lint": "npm run lint:js && npm run lint:css",
+    "migrate:dev": "prisma migrate dev",
+    "migrate:dev-create": "prisma migrate dev --create-only",
+    "migrate:deploy": "prisma migrate deploy"
   },
   "dependencies": {
+    "@prisma/client": "^5.20.0",
     "@supabase/supabase-js": "^2.45.4",
     "vue": "^3.4.37",
     "vue-router": "^4.4.5"
@@ -23,6 +27,7 @@
     "eslint": "^8.38.0",
     "eslint-plugin-vue": "^9.11.0",
     "postcss": "^8.4.47",
+    "prisma": "^5.20.0",
     "stylelint-config-standard": "^36.0.1",
     "stylelint-config-tailwindcss": "^0.0.7",
     "supabase": "^1.192.5",

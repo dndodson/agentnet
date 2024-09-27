@@ -99,7 +99,7 @@ Deno.serve(async (req) => {
       })
     }
 
-    return new Response(JSON.stringify(data), {
+    return new Response(JSON.stringify({ success: true, chatbotId: data.chatbotId }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
@@ -111,7 +111,6 @@ Deno.serve(async (req) => {
     })
   }
 })
-
 /* To invoke locally:
 
   1. Run `supabase start` (see: https://supabase.com/docs/reference/cli/supabase-start)
@@ -124,3 +123,4 @@ Deno.serve(async (req) => {
     --data '{"chatbotName":"testBot","sourceText":"Source text......"}'
 
 */
+
