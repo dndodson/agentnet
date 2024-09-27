@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "agents" ADD COLUMN     "status" TEXT NOT NULL DEFAULT 'PENDING',
+ALTER COLUMN "chatbot_id" DROP NOT NULL;

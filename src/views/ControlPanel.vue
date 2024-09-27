@@ -28,7 +28,25 @@
         <ul class="space-y-4">
           <li v-for="agent in agents" :key="agent.id" class="bg-white shadow rounded-lg p-4">
             <h3 class="text-lg font-semibold mb-2">{{ agent.name }}</h3>
-            <p class="text-gray-600">ID: {{ agent.id }}</p>
+            <div class="flex items-center">
+              <p :class="statusClass(agent.status)" class="flex items-center">
+                Status: {{ agent.status }}
+                <span v-if="agent.status === 'PENDING'" class="ml-2">
+                  <svg class="animate-spin h-4 w-4 text-yellow-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                </span>
+              </p>
+            </div>
+            <div v-if="agent.chatbot_id" class="mt-2">
+              <a :href="`https://chatbase.co/dashboard/agentthis/chatbot/${agent.chatbot_id}`" 
+                 target="_blank" 
+                 rel="noopener noreferrer" 
+                 class="text-blue-500 hover:text-blue-700">
+                Chat with {{ agent.name }}
+              </a>
+            </div>
           </li>
         </ul>
       </div>
@@ -48,41 +66,107 @@
             <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
           </span>
         </div>
-        <CreateChatbot @success="handleSuccess" @error="handleError" />
+        <CreateChatbot 
+          v-if="showCreateForm"
+          @success="handleSuccess" 
+          @error="handleError"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { ref, onMounted } from 'vue'
 import CreateChatbot from '../components/CreateChatbot.vue'
+import { supabase } from '../lib/supabase'
+import { createChatbotBackground } from '../lib/chatbase'
 
 export default {
   name: 'ControlPanel',
   components: {
     CreateChatbot
   },
-  data() {
-    return {
-      showCreateForm: false,
-      agents: [],
-      errorMessage: '',
-      showSuccessBanner: false
+  setup() {
+    const showCreateForm = ref(false)
+    const agents = ref([])
+    const errorMessage = ref('')
+    const showSuccessBanner = ref(false)
+
+    const fetchAgents = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('agents')
+          .select('*')
+          .order('created_at', { ascending: false })
+
+        if (error) throw error
+
+        agents.value = data
+      } catch (error) {
+        console.error('Error fetching agents:', error)
+        errorMessage.value = 'Failed to fetch agents'
+      }
     }
-  },
-  methods: {
-    handleSuccess(agent) {
-      this.agents.push(agent)
-      this.showCreateForm = false
-      this.errorMessage = ''
-      this.showSuccessBanner = true
-      // Automatically hide the success banner after 5 seconds
+
+    onMounted(fetchAgents)
+
+    const handleSuccess = async (agent, chatbotName, urlToCrawl, sourceText) => {
+      agents.value.unshift(agent)
+      showCreateForm.value = false
+      
+      try {
+        // Call createChatbotBackground function and wait for it to complete
+        const result = await createChatbotBackground(agent, chatbotName, urlToCrawl, sourceText)
+        
+        // Update the agent's status in the UI
+        const index = agents.value.findIndex(a => a.id === agent.id)
+        if (index !== -1) {
+          agents.value[index] = { ...agents.value[index], ...result }
+        }
+
+        if (result.status === 'FAILED') {
+          errorMessage.value = 'Failed to create chatbot. Please try again.'
+        } else {
+          showSuccessBanner.value = true
+        }
+      } catch (error) {
+        console.error('Error in createChatbotBackground:', error)
+        errorMessage.value = 'An error occurred while creating the chatbot.'
+        
+        // Update the agent's status to 'FAILED' in the UI
+        const index = agents.value.findIndex(a => a.id === agent.id)
+        if (index !== -1) {
+          agents.value[index] = { ...agents.value[index], status: 'FAILED' }
+        }
+      }
+      
       setTimeout(() => {
-        this.showSuccessBanner = false
+        showSuccessBanner.value = false
       }, 5000)
-    },
-    handleError(message) {
-      this.errorMessage = message
+    }
+
+    const handleError = (message) => {
+      errorMessage.value = message
+    }
+
+    const statusClass = (status) => {
+      switch (status) {
+        case 'PENDING': return 'text-yellow-500'
+        case 'OK': return 'text-green-500'
+        case 'FAILED': return 'text-red-500'
+        default: return 'text-gray-500'
+      }
+    }
+
+    return {
+      showCreateForm,
+      agents,
+      errorMessage,
+      showSuccessBanner,
+      handleSuccess,
+      handleError,
+      statusClass
     }
   }
 }
